@@ -19,6 +19,7 @@ from doxxcaster.bot.settings import (
     SECONDS_TO_SLEEP_ON_ERROR,
 )
 from doxxcaster.bot.warpcast_utils import extract_username_from_cast, reply_to_cast
+from doxxcaster.bot.xmtp_utils import send_xmtp_message
 
 
 def build_message(
@@ -84,6 +85,29 @@ async def handle_cast(wc: Warpcast, cast: ApiCast, fname: str) -> None:
             cast.hash,
             cast.author.username,
         )
+
+        # notify user on XMTP that they have been doxxed
+        for address in socials.addresses:
+            message_id = send_xmtp_message(
+                address,
+                message=f"You've been doxxed on Warpcast by @{cast.author.username} using @{FARCASTER_BOT_USERNAME}.",
+            )
+            if message_id:
+                LOGGER.info(
+                    "[+] Successfully notified doxxed user on XMTP on address=%s (username=%s, cast_hash=%s, user=%s).",
+                    address,
+                    fname,
+                    cast.hash,
+                    cast.author.username,
+                )
+            else:
+                LOGGER.info(
+                    "[-] Failed to notify doxxed user on XMTP on address=%s (username=%s, cast_hash=%s, user=%s).",
+                    address,
+                    fname,
+                    cast.hash,
+                    cast.author.username,
+                )
     except Exception as exc:
         LOGGER.exception("[handle_cast] Failed: %s", exc)
 
