@@ -38,7 +38,7 @@ def _filter_socials(data: Optional[Dict[str, Any]]) -> Socials:
 
     return Socials(
         addresses=list(addresses),
-        ens_names=list(sorted(ens_names, key=lambda x: len(x.split(".")))),
+        ens_names=list(sorted(ens_names, key=lambda x: len(x) + len(x.split(".")))),
         twitter_usernames=list(twitter_usernames),
         lens_names=list(lens_names),
         fc_names=list(fc_names),
@@ -65,7 +65,8 @@ def _filter_spam_erc20_tokens(data: Optional[Dict[str, Any]]) -> List[ERC20Balan
         # sort heavy bags first 🤑
         erc20_tokens = sorted(
             eth_erc20_tokens,
-            key=lambda x: x["formattedAmount"] * x.get("price", 1),
+            key=lambda x: x["formattedAmount"]
+            * x.get("price", 0.0000001),  # assume shitcoin price
             reverse=True,
         )
 
