@@ -20,7 +20,7 @@ def _filter_socials(data: Optional[Dict[str, Any]]) -> Socials:
     )
 
     if isinstance(data, dict):
-        socials = data.get("Socials", {}).get("Social", [])
+        socials = data.get("Socials", {}).get("Social", []) or []
         for social in socials:
             if social.get("userAddress"):
                 addresses.add(social["userAddress"])
@@ -31,7 +31,7 @@ def _filter_socials(data: Optional[Dict[str, Any]]) -> Socials:
             elif social.get("dappName") == "farcaster" and social.get("fnames"):
                 fc_names.update(f"@{fname}" for fname in social["fnames"])
 
-        domains = data.get("Domains", {}).get("Domain", [])
+        domains = data.get("Domains", {}).get("Domain", []) or []
         for domain in domains:
             if domain.get("dappName") == "ens" and domain.get("name"):
                 ens_names.add(domain["name"])
@@ -56,7 +56,7 @@ def _filter_spam_erc20_tokens(data: Optional[Dict[str, Any]]) -> List[ERC20Balan
                 **tokenprice_map.get(erc20_token["token"]["symbol"], {}),
                 "blockchain": "ethereum",
             }
-            for erc20_token in data.get("Ethereum", {}).get("TokenBalance", [])
+            for erc20_token in (data.get("Ethereum", {}).get("TokenBalance", []) or [])
             if erc20_token
             and "token" in erc20_token
             and not erc20_token["token"]["isSpam"]
