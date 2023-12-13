@@ -2,7 +2,11 @@
 
 Bot: [`@doxxbot`](https://warpcast.com/doxxbot)
 
-Anyone can drop a mention to `@doxxbot` in a cast to snoop on a Farcaster user's other social hangouts and top 10 ERC-20 stash, all without leaving Warpcast. It's a seamless way to unmasking identities and spotting potential biases. On the flipside, if you're all about that privacy, the bot's got your back – check how exposed you are and dial it down.
+Anyone can drop a mention to `@doxxbot` in a cast to snoop on a Farcaster user's other social hangouts and top 10 ERC-20 stash, all without leaving Warpcast.
+
+Just for the heck of it, the doxxed user is also notified via a message on [XMTP](https://xmtp.org/) with the replied cast's URL.
+
+_Why?_ It's a seamless way to unmasking identities and spotting potential biases. On the flipside, if you're all about that privacy, the bot's got your back – check how exposed you are and dial it down.
 
 Submitted as part of [ETHIndia 2023, Bangalore, India](https://devfolio.co/projects/doxxcaster-bd92).
 
