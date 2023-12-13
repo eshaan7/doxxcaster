@@ -20,7 +20,9 @@ yargs(hideBin(process.argv))
             if (isOnXmtp) {
                 const conversation = await client.conversations.newConversation(address)
                 const sent = await conversation.send(message)
-                if (console.error == undefined) console.log(sent.id)
+                if (sent.error == undefined) console.log(sent.id)
+            } else {
+                console.log(null)
             }
         }
     )

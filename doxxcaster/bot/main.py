@@ -18,7 +18,11 @@ from doxxcaster.bot.settings import (
     MAX_NUM_BAGS_IN_MESSAGE,
     SECONDS_TO_SLEEP_ON_ERROR,
 )
-from doxxcaster.bot.warpcast_utils import extract_username_from_cast, reply_to_cast
+from doxxcaster.bot.warpcast_utils import (
+    build_cast_url,
+    extract_username_from_cast,
+    reply_to_cast,
+)
 from doxxcaster.bot.xmtp_utils import send_xmtp_message
 
 
@@ -78,9 +82,11 @@ async def handle_cast(wc: Warpcast, cast: ApiCast, fname: str) -> None:
         message = build_message(fname, socials, erc20_balances)
 
         # post reply cast
-        reply_to_cast(wc, cast, message=message)
+        replied_cast = reply_to_cast(wc, cast, message=message)
+        replied_cast_url = build_cast_url(FARCASTER_BOT_USERNAME, replied_cast.hash)
         LOGGER.info(
-            "[+] Successfully replied to cast (username=%s, cast_hash=%s, user=%s).",
+            "[+] Successfully replied to cast (url=%s, username=%s, cast_hash=%s, user=%s).",
+            replied_cast_url,
             fname,
             cast.hash,
             cast.author.username,
@@ -90,7 +96,7 @@ async def handle_cast(wc: Warpcast, cast: ApiCast, fname: str) -> None:
         for address in socials.addresses:
             message_id = send_xmtp_message(
                 address,
-                message=f"You've been doxxed on Warpcast by @{cast.author.username} using @{FARCASTER_BOT_USERNAME}.",
+                message=f"You've been doxxed on Warpcast by @{cast.author.username} using @{FARCASTER_BOT_USERNAME}. See: {replied_cast_url}",
             )
             if message_id:
                 LOGGER.info(
@@ -100,9 +106,17 @@ async def handle_cast(wc: Warpcast, cast: ApiCast, fname: str) -> None:
                     cast.hash,
                     cast.author.username,
                 )
-            else:
+            elif message_id is False:
                 LOGGER.info(
                     "[-] Failed to notify doxxed user on XMTP on address=%s (username=%s, cast_hash=%s, user=%s).",
+                    address,
+                    fname,
+                    cast.hash,
+                    cast.author.username,
+                )
+            elif message_id is None:
+                LOGGER.info(
+                    "[-] Couldn't notify doxxed user is not on XMTP on address=%s (username=%s, cast_hash=%s, user=%s).",
                     address,
                     fname,
                     cast.hash,
